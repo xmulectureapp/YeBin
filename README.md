@@ -32,7 +32,7 @@
 10 点击提醒按钮开启RemindCenter进行设置，设置完返回当前Activity
 
 
-test
+今天开始写代码
 
 
 
