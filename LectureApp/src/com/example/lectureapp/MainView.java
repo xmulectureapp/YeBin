@@ -20,6 +20,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 public class MainView extends Activity 
 {
@@ -43,6 +44,13 @@ public class MainView extends Activity
 	
 	private ImageView mTab5;
 	private int four;
+	
+	//获取main menu下的文字标题
+	private TextView mText1;
+	private TextView mText2;
+	private TextView mText3;
+	private TextView mText4;
+	private TextView mText5;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -80,6 +88,14 @@ public class MainView extends Activity
         mTab4.setOnClickListener(new MyOnClickListener(3));
         
         mTab5.setOnClickListener(new MyOnClickListener(4));
+        
+        //获取菜单文字句柄
+        mText1 = (TextView)findViewById(R.id.mText1);
+        mText2 = (TextView)findViewById(R.id.mText2);
+        mText3 = (TextView)findViewById(R.id.mText3);
+        mText4 = (TextView)findViewById(R.id.mText4);
+        mText5 = (TextView)findViewById(R.id.mText5);
+        
         
         Display currDisplay = getWindowManager().getDefaultDisplay();//获取屏幕当前分辨率
         int displayWidth = currDisplay.getWidth();
@@ -167,88 +183,113 @@ public class MainView extends Activity
 			switch (arg0) {
 			case 0:
 				mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_pressed));
+				mText1.setTextColor(getResources().getColor(R.color.main_menu_pressed));
 				if (currIndex == 1) {
 					animation = new TranslateAnimation(one, 0, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_normal));
+					mText2.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				} else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, 0, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_normal));
+					mText3.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 3) {
 					animation = new TranslateAnimation(three, 0, 0, 0);
 					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_normal));
+					mText4.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}else if (currIndex == 4) {
 					animation = new TranslateAnimation(four, 0, 0, 0);
 					mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
+					mText5.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				break;
 			case 1:
-				mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_normal));
+				mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_pressed));
+				mText2.setTextColor(getResources().getColor(R.color.main_menu_pressed));
 				if (currIndex == 0) {
 					animation = new TranslateAnimation(zero, one, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_pressed));
+					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_normal));
+					mText1.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				} else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, one, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_normal));
+					mText3.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 3) {
 					animation = new TranslateAnimation(three, one, 0, 0);
 					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_normal));
+					mText4.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}else if (currIndex == 4) {
 					animation = new TranslateAnimation(four, one, 0, 0);
 					mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
+					mText5.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				break;
 			case 2:
-				mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_normal));
+				mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_pressed));
+				mText3.setTextColor(getResources().getColor(R.color.main_menu_pressed));
 				if (currIndex == 0) {
 					animation = new TranslateAnimation(zero, two, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_pressed));
+					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_normal));
+					mText1.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				} else if (currIndex == 1) {
 					animation = new TranslateAnimation(one, two, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_normal));
+					mText2.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 3) {
 					animation = new TranslateAnimation(three, two, 0, 0);
 					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_normal));
+					mText4.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}else if (currIndex == 4) {
 					animation = new TranslateAnimation(four, two, 0, 0);
 					mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
+					mText5.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				break;
 			case 3:
-				mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_normal));
+				mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_pressed));
+				mText4.setTextColor(getResources().getColor(R.color.main_menu_pressed));
 				if (currIndex == 0) {
 					animation = new TranslateAnimation(zero, three, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_pressed));
+					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_normal));
+					mText1.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				} else if (currIndex == 1) {
 					animation = new TranslateAnimation(one, three, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_normal));
+					mText2.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, three, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_normal));
+					mText3.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 4) {
 					animation = new TranslateAnimation(four, three, 0, 0);
 					mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
+					mText5.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				break;
 			case 4:
-				mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
+				mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_pressed));
+				mText5.setTextColor(getResources().getColor(R.color.main_menu_pressed));
 				if (currIndex == 0) {
 					animation = new TranslateAnimation(zero, four, 0, 0);
-					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_pressed));
+					mTab1.setImageDrawable(getResources().getDrawable(R.drawable.subscribecenter_normal));
+					mText1.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				} else if (currIndex == 1) {
 					animation = new TranslateAnimation(one, four, 0, 0);
 					mTab2.setImageDrawable(getResources().getDrawable(R.drawable.hotlecturecenter_normal));
+					mText2.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				else if (currIndex == 2) {
 					animation = new TranslateAnimation(two, four, 0, 0);
 					mTab3.setImageDrawable(getResources().getDrawable(R.drawable.noticecenter_normal));
+					mText3.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}else if (currIndex == 3) {
 					animation = new TranslateAnimation(three, four, 0, 0);
 					mTab4.setImageDrawable(getResources().getDrawable(R.drawable.submitcenter_normal));
+					mText4.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
 				break;
 			}
