@@ -6,6 +6,10 @@ import java.util.HashMap;
 
 
 
+import java.util.List;
+
+import com.lecture.DBCenter.ListToDB;
+import com.lecture.DBCenter.XMLToList;
 import com.lecture.lectureapp.R;
 
 import android.os.Bundle;
@@ -37,6 +41,10 @@ import android.widget.Toast;
 public class MainView extends Activity 
 {
 	public static MainView instance = null;
+	
+	//Êý¾Ý¿â
+	public static final String DB_NAME = "LectureDB";
+	private ListToDB listToDB = new ListToDB(this, DB_NAME, 1);
 	 
 	private ViewPager mTabPager;	
 	private ImageView mTabImg;// ¶¯»­Í¼Æ¬
@@ -122,9 +130,14 @@ public class MainView extends Activity
         			public void onClick(View arg0) {
         				//Intent intent = new Intent(MainView.this,RefreshCenter.class);
         				//startActivity(intent);
-        				Intent intent = new Intent(MainView.this,
-        						RefreshCenter.class);
-        				startActivity(intent);
+        				//Intent intent = new Intent(MainView.this,
+        					//	RefreshCenter.class);
+        				//startActivity(intent);
+        				
+        				//XML TO List, then to db
+        				XMLToList xmlToList = new XMLToList();
+        				xmlToList.insertListToDB(MainView.this, listToDB, "LectureTable");
+        				
         				
         				
         			}

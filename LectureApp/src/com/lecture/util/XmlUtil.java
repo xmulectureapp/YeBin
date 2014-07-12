@@ -42,13 +42,13 @@ public class XmlUtil {
 					}
 					if (event != null) {
 						if (tagName.equals("what")) {
-							event.setName(mParser.nextText());
+							event.setTitle(mParser.nextText());
 						} else if (tagName.equalsIgnoreCase("starttime")) {
 							event.setTime(mParser.nextText());
 						} else if (tagName.equals("where")) {
 							 event.setAddress(mParser.nextText());
 						} else if (tagName.equals("who")) {
-							event.setOwner(mParser.nextText());
+							event.setSpeaker(mParser.nextText());
 						} else if (tagName.equals("link")) {
 							event.setLink(mParser.nextText());
 						}

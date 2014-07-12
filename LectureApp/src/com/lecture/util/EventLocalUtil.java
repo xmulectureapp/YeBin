@@ -107,7 +107,7 @@ public class EventLocalUtil {
 
 	public static void saveInfo(Context context, Event data) {
 		File saveFile = new File(context.getCacheDir().getAbsolutePath(),
-				data.getName() + ".sdll");
+				data.getTitle() + ".sdll");
 		FileOutputStream fileOut = null;
 		ObjectOutputStream out = null;
 		try {
@@ -121,10 +121,10 @@ public class EventLocalUtil {
 			out.writeObject(data);
 		} catch (FileNotFoundException e) {
 			Log.e(TAG,
-					data.getName() + "   ±£´æ½²×ùÐÅÏ¢Ê§°Ü   ===>>" + e.getMessage());
+					data.getTitle() + "   ±£´æ½²×ùÐÅÏ¢Ê§°Ü   ===>>" + e.getMessage());
 		} catch (IOException e) {
 			Log.e(TAG,
-					data.getName() + "   ±£´æ½²×ùÐÅÏ¢Ê§°Ü  ===>>" + e.getMessage());
+					data.getTitle() + "   ±£´æ½²×ùÐÅÏ¢Ê§°Ü  ===>>" + e.getMessage());
 		} finally {
 			try {
 				if (out != null)

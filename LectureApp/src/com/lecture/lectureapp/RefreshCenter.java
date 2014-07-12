@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ public class RefreshCenter  extends Activity{
 		//getActionBar().setDisplayHomeAsUpEnabled(true);
 		//setFragment();
 		this.refresh();
+		this.finish();
 	}
 	
 
@@ -100,5 +102,12 @@ public class RefreshCenter  extends Activity{
 		getEventsUtil.getInfo(this);
 		//this.finish();
 		//return true;
+	}
+	@Override
+	protected void onDestroy(){
+		
+		Log.i("Refresh Center on Destroy", "¹Ø±Õ RefreshCenter!");
+		mProgressDialog.dismiss();
+		super.onDestroy();
 	}
 }

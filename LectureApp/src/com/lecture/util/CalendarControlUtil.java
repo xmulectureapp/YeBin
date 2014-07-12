@@ -56,8 +56,8 @@ public class CalendarControlUtil {
 		// Ìí¼ÓÊÂ¼þ
 		ContentValues event = new ContentValues();
 		GregorianCalendar calDate = data.getTimeCalendar();
-		event.put(Events.TITLE, data.getName());
-		event.put(Events.DESCRIPTION, data.getOwner());
+		event.put(Events.TITLE, data.getTitle());
+		event.put(Events.DESCRIPTION, data.getSpeaker());
 		event.put(Events.CALENDAR_ID, calendarId);
 		event.put(Events.EVENT_LOCATION, data.getAddress());
 		event.put(Events.DTSTART, calDate.getTime().getTime());
@@ -107,9 +107,9 @@ public class CalendarControlUtil {
 	public static void setAlert(Activity activity, Event data) {
 		Intent calIntent = new Intent(Intent.ACTION_INSERT);
 		calIntent.setType("vnd.android.cursor.item/event");
-		calIntent.putExtra(Events.TITLE, data.getName());
+		calIntent.putExtra(Events.TITLE, data.getTitle());
 		calIntent.putExtra(Events.EVENT_LOCATION, data.getAddress());
-		calIntent.putExtra(Events.DESCRIPTION, data.getOwner());
+		calIntent.putExtra(Events.DESCRIPTION, data.getSpeaker());
 		GregorianCalendar calDate = data.getTimeCalendar();
 		calIntent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
 		calIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,

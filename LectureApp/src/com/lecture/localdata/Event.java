@@ -8,11 +8,11 @@ public class Event implements Serializable {
 
 
 	private String uid;
-	private String name;
+	private String title;
 	private String address;
 	private String time;
 	private String link;
-	private String owner;
+	private String speaker;
 	private boolean isCalender;
 	private boolean isLove;
 	private DetailInfo detailInfo;
@@ -20,7 +20,7 @@ public class Event implements Serializable {
 
 	public Event() {
 		uid = "";
-		name = "";
+		title = "";
 		address = "";
 		time = "";
 		link = "";
@@ -35,12 +35,12 @@ public class Event implements Serializable {
 		uid = id;
 	}
 
-	public String getOwner() {
-		return owner;
+	public String getSpeaker() {
+		return speaker;
 	}
 
-	public void setOwner(String owner) {
-		this.owner = owner;
+	public void setSpeaker(String speaker) {
+		this.speaker = speaker;
 	}
 
 	public String getUid() {
@@ -51,12 +51,12 @@ public class Event implements Serializable {
 		this.uid = uid;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getAddress() {
@@ -134,7 +134,7 @@ public class Event implements Serializable {
 
 	@Override
 	public String toString() {
-		return "讲座名称：" + name + "\n讲座地址：" + address + "\n讲座时间：" + time
-				+ "\n主讲人：" + owner;
+		return "讲座名称：" + title + "\n讲座地址：" + address + "\n讲座时间：" + time
+				+ "\n主讲人：" + speaker;
 	}
 }
