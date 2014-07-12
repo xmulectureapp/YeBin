@@ -3,7 +3,10 @@ package com.lecture.lectureapp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.example.lectureapp.R;
+
+
+
+import com.lecture.lectureapp.R;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -16,6 +19,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
@@ -60,6 +64,9 @@ public class MainView extends Activity
 	private TextView mText4;
 	private TextView mText5;
 	private Myadapter myadapter;
+	
+	//mainview top button
+	private TextView topTextView;
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
@@ -104,6 +111,27 @@ public class MainView extends Activity
         mText3 = (TextView)findViewById(R.id.mText3);
         mText4 = (TextView)findViewById(R.id.mText4);
         mText5 = (TextView)findViewById(R.id.mText5);
+        
+        //下面获取mianview上面的筛选讲座按钮的句柄
+        topTextView = (TextView)findViewById(R.id.filterTextView);
+        OnClickListener listener = 
+                
+                new OnClickListener() {
+        			
+        			@Override
+        			public void onClick(View arg0) {
+        				//Intent intent = new Intent(MainView.this,RefreshCenter.class);
+        				//startActivity(intent);
+        				Intent intent = new Intent(MainView.this,
+        						RefreshCenter.class);
+        				startActivity(intent);
+        				
+        				
+        			}
+        		};
+        topTextView.setOnClickListener(listener);
+        
+       
         
         
         Display currDisplay = getWindowManager().getDefaultDisplay();//获取屏幕当前分辨率

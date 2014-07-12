@@ -1,6 +1,6 @@
 package com.lecture.lectureapp;
 
-import com.example.lectureapp.R;
+import com.lecture.lectureapp.R;
 
 import android.app.Activity;
 import android.app.ActionBar;

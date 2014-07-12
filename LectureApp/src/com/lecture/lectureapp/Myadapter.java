@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.example.lectureapp.R;
+import com.lecture.lectureapp.R;
 import com.lecture.lectureapp.Myadapter.ViewHolder;
 
 import android.app.Activity;

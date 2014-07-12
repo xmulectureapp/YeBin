@@ -2,7 +2,7 @@ package com.lecture.lectureapp;
 
 import java.io.OutputStream;
 
-import com.example.lectureapp.R;
+import com.lecture.lectureapp.R;
 
 import android.app.Activity;
 import android.content.Context;

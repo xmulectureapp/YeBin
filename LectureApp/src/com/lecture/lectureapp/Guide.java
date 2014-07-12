@@ -6,7 +6,7 @@ import java.util.ArrayList;
 //import cn.buaa.myweixin.Whatsnew;
 //import cn.buaa.myweixin.WhatsnewDoor;
 
-import com.example.lectureapp.R;
+import com.lecture.lectureapp.R;
 
 import android.app.Activity;
 import android.content.Intent;

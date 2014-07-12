@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.content.Context;
+import android.util.Log;
 
 
 
@@ -71,6 +72,7 @@ public class GetEventsHttpUtil {
 						out.write(buffer, 0, length);
 						// System.out.write(buffer, 0, length);
 					}
+					Log.i("DownLoad","œ¬‘ÿ≥…π¶£°");
 					mCallback.onEnd();
 				}
 				catch (MalformedURLException e) {
