@@ -29,10 +29,11 @@ public class Myadapter extends BaseAdapter
 {
 	  private LayoutInflater mInflater;  
 	  private Context mContext;
+	  
 	 // private DBCenter dbCenter = new DBCenter(null, MainView.DB_NAME, 1);
 	  
 	  private Cursor cursor;
-
+	  
 	private List<Map<String, Object>> mData; 
 	final String[] LTitle = { "An introduction to nonparametric regression", 
 			"台湾土壤与地下水污染及整治技术现况",
@@ -169,6 +170,14 @@ public class Myadapter extends BaseAdapter
 		this.mContext=context;
 		this.mInflater = LayoutInflater.from(context);  
 		mData=getData(null, null, null);
+		this.cursor = null;
+	}    
+	public Myadapter(Context context, List<Map<String, Object>> list)
+	{  
+
+		this.mContext=context;
+		this.mInflater = LayoutInflater.from(context);  
+		mData = list;
 		this.cursor = null;
 	}  
 	public Myadapter(Context context, Cursor cursor)

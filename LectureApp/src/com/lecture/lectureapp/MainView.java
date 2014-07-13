@@ -48,7 +48,8 @@ public class MainView extends Activity
 	//数据库
 	public static final String DB_NAME = "LectureDB";
 	private DBCenter dbCenter = new DBCenter(this, DB_NAME, 1);
-	 
+	private List<Map<String, Object>> mData;
+	
 	private ViewPager mTabPager;	
 	private ImageView mTabImg;// 动画图片
 	private ImageView mTab1,mTab2,mTab3,mTab4;
@@ -227,8 +228,15 @@ public class MainView extends Activity
 		mTabPager.setAdapter(mPagerAdapter);
 		Cursor cursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
 		startManagingCursor(cursor);
+		Log.i("SELECT", "Cursor游标采取数据开始！");
+
+		List<Map<String, Object>> result = DBCenter
+				.L_converCursorToList(cursor);
+		mData = result;
 		//来自Yao的更改 2014年7月7号
-		myadapter = new Myadapter(this, cursor);
+		myadapter = new Myadapter(this, mData);
+		Log.i("Myadapter", "适配器构建成功！");
+
 		list.setAdapter(myadapter);
 		// ListView 中某项被选中后的逻辑  
 		 list.setOnItemClickListener(new OnItemClickListener() {  
