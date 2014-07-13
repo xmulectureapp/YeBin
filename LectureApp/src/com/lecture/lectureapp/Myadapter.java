@@ -29,7 +29,10 @@ public class Myadapter extends BaseAdapter
 {
 	  private LayoutInflater mInflater;  
 	  private Context mContext;
-	  private DBCenter dbCenter = new DBCenter(null, MainView.DB_NAME, 1);
+	 // private DBCenter dbCenter = new DBCenter(null, MainView.DB_NAME, 1);
+	  
+	  private Cursor cursor;
+
 	private List<Map<String, Object>> mData; 
 	final String[] LTitle = { "An introduction to nonparametric regression", 
 			"台湾土壤与地下水污染及整治技术现况",
@@ -54,15 +57,22 @@ public class Myadapter extends BaseAdapter
 
 	private List<Map<String, Object>> getData(String time, String place, String subject) 
 	{  
-		//*
+		/*
 		Log.i("SELECT", "开始查询信息。。。。");
 		Cursor selectCursor = dbCenter.select(dbCenter.getReadableDatabase(), time, place, subject);
 		Log.i("SELECT", "数据库查询结束。。");
+		//startManagingCursor(selectCursor);
 		List<Map<String, Object>> result = dbCenter
 				.L_converCursorToList(selectCursor);
 		
 		return result;
-		//*/
+		*/
+		Log.i("SELECT", "Cursor游标采取数据开始！");
+
+		List<Map<String, Object>> result = DBCenter
+				.L_converCursorToList(cursor);
+
+		return result;
 		/*
 	    List<Map<String,Object>> listItem = new ArrayList<Map<String,Object>>();
 	    for(int i=0;i<5;i++)
@@ -75,7 +85,7 @@ public class Myadapter extends BaseAdapter
 	    	listItem.add(map);
 		}  
 	    
-		  return listItem;  
+		return listItem;  
 	  */
 	}  
 	public void showInfo1(){
@@ -159,6 +169,16 @@ public class Myadapter extends BaseAdapter
 		this.mContext=context;
 		this.mInflater = LayoutInflater.from(context);  
 		mData=getData(null, null, null);
+		this.cursor = null;
+	}  
+	public Myadapter(Context context, Cursor cursor)
+	{  
+
+		this.mContext=context;
+		this.mInflater = LayoutInflater.from(context);  
+		mData=getData(null, null, null);
+		this.cursor = cursor;
+		
 	}
 		@Override
 		public int getCount() {

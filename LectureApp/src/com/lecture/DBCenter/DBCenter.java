@@ -95,7 +95,7 @@ public class DBCenter extends SQLiteOpenHelper {
 		}
 		
 		// --------将数据库查询LECTURETABLE结果CURSOR转化为List 读取 1 2 3 4 5 列-------//
-		public List<Map<String, Object>> L_converCursorToList(Cursor cursor) {
+		public static List<Map<String, Object>> L_converCursorToList(Cursor cursor) {
 			ArrayList<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 
 			while (cursor.moveToNext()) {

@@ -131,29 +131,27 @@ public class MainView extends Activity
         			
         			@Override
         			public void onClick(View arg0) {
-        				//Intent intent = new Intent(MainView.this,RefreshCenter.class);
-        				//startActivity(intent);
-        				//*
+        				/*
         				Intent intent = new Intent(MainView.this,
         						RefreshCenter.class);
         				startActivity(intent);
-        				//*/
+        				*/
         				//XML TO List, then to db
-        				XMLToList xmlToList = new XMLToList();
-        				xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
+        				//XMLToList xmlToList = new XMLToList();
+        				//xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
         				
         				//test List Map
-        			/*	
+        				
         				Log.i("SELECT", "开始查询信息。。。。");
         				Cursor selectCursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
         				Log.i("SELECT", "数据库查询结束。。");
         				List<Map<String, Object>> result = dbCenter
         						.L_converCursorToList(selectCursor);
 
-        				Toast.makeText(MainView.this, result.get(2).get("lecture_name").toString(), Toast.LENGTH_LONG);
+        				//Toast.makeText(MainView.this, result.get(2).get("lecture_name").toString(), Toast.LENGTH_LONG);
         				topTextView.setText(result.get(2).get("lecture_name").toString());
         				
-        				*/
+        				
         			}
         		};
         topTextView.setOnClickListener(listener);
@@ -227,9 +225,10 @@ public class MainView extends Activity
 		};
 		
 		mTabPager.setAdapter(mPagerAdapter);
-		
+		Cursor cursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
+		startManagingCursor(cursor);
 		//来自Yao的更改 2014年7月7号
-		myadapter = new Myadapter(this);
+		myadapter = new Myadapter(this, cursor);
 		list.setAdapter(myadapter);
 		// ListView 中某项被选中后的逻辑  
 		 list.setOnItemClickListener(new OnItemClickListener() {  
