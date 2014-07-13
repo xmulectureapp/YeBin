@@ -20,7 +20,7 @@ public class XMLToList {
 		events = null;
 	}
 	
-	public void insertListToDB(Context context, ListToDB listToDB, String tableName) {
+	public void insertListToDB(Context context, DBCenter listToDB, String tableName) {
 
 			events = XmlUtil.readXml(
 					GetEventsHttpUtil.getEventsPath(context).getPath(),

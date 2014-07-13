@@ -7,17 +7,20 @@ import java.util.HashMap;
 
 
 import java.util.List;
+import java.util.Map;
 
-import com.lecture.DBCenter.ListToDB;
+import com.lecture.DBCenter.DBCenter;
 import com.lecture.DBCenter.XMLToList;
 import com.lecture.lectureapp.R;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -44,7 +47,7 @@ public class MainView extends Activity
 	
 	//数据库
 	public static final String DB_NAME = "LectureDB";
-	private ListToDB listToDB = new ListToDB(this, DB_NAME, 1);
+	private DBCenter dbCenter = new DBCenter(this, DB_NAME, 1);
 	 
 	private ViewPager mTabPager;	
 	private ImageView mTabImg;// 动画图片
@@ -130,16 +133,27 @@ public class MainView extends Activity
         			public void onClick(View arg0) {
         				//Intent intent = new Intent(MainView.this,RefreshCenter.class);
         				//startActivity(intent);
-        				//Intent intent = new Intent(MainView.this,
-        					//	RefreshCenter.class);
-        				//startActivity(intent);
-        				
+        				//*
+        				Intent intent = new Intent(MainView.this,
+        						RefreshCenter.class);
+        				startActivity(intent);
+        				//*/
         				//XML TO List, then to db
         				XMLToList xmlToList = new XMLToList();
-        				xmlToList.insertListToDB(MainView.this, listToDB, "LectureTable");
+        				xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
         				
+        				//test List Map
+        			/*	
+        				Log.i("SELECT", "开始查询信息。。。。");
+        				Cursor selectCursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
+        				Log.i("SELECT", "数据库查询结束。。");
+        				List<Map<String, Object>> result = dbCenter
+        						.L_converCursorToList(selectCursor);
+
+        				Toast.makeText(MainView.this, result.get(2).get("lecture_name").toString(), Toast.LENGTH_LONG);
+        				topTextView.setText(result.get(2).get("lecture_name").toString());
         				
-        				
+        				*/
         			}
         		};
         topTextView.setOnClickListener(listener);

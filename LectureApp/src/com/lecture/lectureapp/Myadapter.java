@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lecture.DBCenter.DBCenter;
 import com.lecture.lectureapp.R;
 import com.lecture.lectureapp.Myadapter.ViewHolder;
 
@@ -12,7 +13,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,7 @@ public class Myadapter extends BaseAdapter
 {
 	  private LayoutInflater mInflater;  
 	  private Context mContext;
+	  private DBCenter dbCenter = new DBCenter(null, MainView.DB_NAME, 1);
 	private List<Map<String, Object>> mData; 
 	final String[] LTitle = { "An introduction to nonparametric regression", 
 			"台湾土壤与地下水污染及整治技术现况",
@@ -48,9 +52,18 @@ public class Myadapter extends BaseAdapter
     		"方旭东 教授", 
     		"李美华" };
 
-	private List<Map<String, Object>> getData() 
+	private List<Map<String, Object>> getData(String time, String place, String subject) 
 	{  
+		//*
+		Log.i("SELECT", "开始查询信息。。。。");
+		Cursor selectCursor = dbCenter.select(dbCenter.getReadableDatabase(), time, place, subject);
+		Log.i("SELECT", "数据库查询结束。。");
+		List<Map<String, Object>> result = dbCenter
+				.L_converCursorToList(selectCursor);
 		
+		return result;
+		//*/
+		/*
 	    List<Map<String,Object>> listItem = new ArrayList<Map<String,Object>>();
 	    for(int i=0;i<5;i++)
 	    {
@@ -61,8 +74,9 @@ public class Myadapter extends BaseAdapter
 	    	map.put("lecture_speaker","主讲: "+LSpeaker[i]);
 	    	listItem.add(map);
 		}  
-		    
+	    
 		  return listItem;  
+	  */
 	}  
 	public void showInfo1(){
 		
@@ -144,7 +158,7 @@ public class Myadapter extends BaseAdapter
 
 		this.mContext=context;
 		this.mInflater = LayoutInflater.from(context);  
-		mData=getData();
+		mData=getData(null, null, null);
 	}
 		@Override
 		public int getCount() {
