@@ -13,8 +13,17 @@ import com.lecture.DBCenter.DBCenter;
 import com.lecture.DBCenter.XMLToList;
 import com.lecture.lectureapp.R;
 
+
+
+import com.lecture.util.GetEventsHttpUtil;
+import com.lecture.util.GetEventsHttpUtil.GetEventsCallback;
+
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.view.PagerAdapter;
@@ -43,6 +52,9 @@ import android.widget.Toast;
 
 public class MainView extends Activity 
 {
+	
+	
+	
 	public static MainView instance = null;
 	
 	//数据库
@@ -76,9 +88,121 @@ public class MainView extends Activity
 	private TextView mText4;
 	private TextView mText5;
 	private Myadapter myadapter;
+	public ListView list;
 	
 	//mainview top button
 	private TextView topTextView;
+	
+	
+	
+	//——————————————————————下面是用于handler的消息标记
+		private static final int MESSAGE_REFRESH_START = 1;//刷新开始
+		private static final int MESSAGE_REFRESH_END = 2;//刷新结束
+		private static final int MESSAGE_REFRESH_FAILED = 3;//刷新失败
+		private ProgressDialog mProgressDialog;
+		
+		//第二个handler
+		private Handler refreshHandler = new Handler() {
+			@Override
+			public void handleMessage(Message message) {
+				final String msg = (String) message.obj;
+				if (message.what == MESSAGE_REFRESH_START) {
+					mProgressDialog = ProgressDialog.show(MainView.this,
+							"请稍后", msg, true, false);
+				} else if (message.what == MESSAGE_REFRESH_END) {
+					if (mProgressDialog != null) {
+						mProgressDialog.dismiss();
+						mProgressDialog = null;
+						
+						
+						Log.i("MESSAGE_XML_TO_LISTDB_SUCCESS", "光标Cursor准备就绪！");
+						
+						Cursor cursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
+						//startManagingCursor(cursor);
+						Log.i("SELECT", "Cursor游标采取数据开始！");
+
+						List<Map<String, Object>> result = DBCenter
+								.L_converCursorToList(cursor);
+						mData = result;
+						//来自Yao的更改 2014年7月7号
+						myadapter = new Myadapter(MainView.this, mData);
+						Log.i("Myadapter", "适配器构建成功！");
+					    
+						list.setAdapter(myadapter);
+						//下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
+						list.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
+							
+						// ListView 中某项被选中后的逻辑  
+						list.setOnItemClickListener(new OnItemClickListener() {  
+						        
+								@Override
+								public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+										long arg3) {
+									// TODO Auto-generated method stub
+									//Toast.makeText(MainView.this,"您选择了讲座：" + myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
+									 
+								}  
+						    });
+					
+					}
+				} else if (message.what == MESSAGE_REFRESH_FAILED) {
+					if (mProgressDialog != null)
+						mProgressDialog.dismiss();
+					mProgressDialog = null;
+					Toast.makeText(MainView.this, msg, Toast.LENGTH_SHORT)
+							.show();
+				}
+
+			}
+
+		};
+		//第二个handler结束	
+		
+		// 下面是第二个handler对应处理的refresh()
+		public void refresh() {
+			GetEventsHttpUtil getEventsUtil = GetEventsHttpUtil
+					.getInstance(new GetEventsCallback() {
+
+						@Override
+						public void onStart() {
+							Message msg = new Message();
+							msg.what = MESSAGE_REFRESH_START;
+							msg.obj = "正在更新...";
+							refreshHandler.sendMessage(msg);
+						}
+
+						@Override
+						public void onEnd() {
+							
+							//XML TO List, then to db
+							XMLToList xmlToList = new XMLToList();
+							xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
+							
+							Log.i("在RefreshCenter进行的操作", "XMLToList已经将数据存入数据库！");
+							Message msg = new Message();
+							msg.what = MESSAGE_REFRESH_END;
+							refreshHandler.sendMessage(msg);
+							
+							
+							
+							
+						}
+
+						@Override
+						public void onNoInternet() {
+							Message msg = new Message();
+							msg.what = MESSAGE_REFRESH_FAILED;
+							msg.obj = "无法连接到网络...";
+							refreshHandler.sendMessage(msg);
+						}
+					});
+			getEventsUtil.getInfo(this);
+			
+		}
+		//--------------refresh() 结束
+
+
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
@@ -89,14 +213,7 @@ public class MainView extends Activity
 		 //启动activity时不自动弹出软键盘
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); 
         instance = this;
-        /*
-        mRightBtn = (Button) findViewById(R.id.right_btn);
-        mRightBtn.setOnClickListener(new Button.OnClickListener()
-		{	@Override
-			public void onClick(View v)
-			{	showPopupWindow (MainWeixin.this,mRightBtn);
-			}
-		  });*/
+        
         
         mTabPager = (ViewPager)findViewById(R.id.tabpager);
         mTabPager.setOnPageChangeListener(new MyOnPageChangeListener());
@@ -123,6 +240,7 @@ public class MainView extends Activity
         mText3 = (TextView)findViewById(R.id.mText3);
         mText4 = (TextView)findViewById(R.id.mText4);
         mText5 = (TextView)findViewById(R.id.mText5);
+    
         
         //下面获取mianview上面的筛选讲座按钮的句柄
         topTextView = (TextView)findViewById(R.id.filterTextView);
@@ -132,31 +250,14 @@ public class MainView extends Activity
         			
         			@Override
         			public void onClick(View arg0) {
-        				/*
-        				Intent intent = new Intent(MainView.this,
-        						RefreshCenter.class);
-        				startActivity(intent);
-        				*/
-        				//XML TO List, then to db
-        				//XMLToList xmlToList = new XMLToList();
-        				//xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
         				
-        				//test List Map
         				
-        				Log.i("SELECT", "开始查询信息。。。。");
-        				Cursor selectCursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
-        				Log.i("SELECT", "数据库查询结束。。");
-        				List<Map<String, Object>> result = dbCenter
-        						.L_converCursorToList(selectCursor);
-
-        				//Toast.makeText(MainView.this, result.get(2).get("lecture_name").toString(), Toast.LENGTH_LONG);
-        				topTextView.setText(result.get(2).get("lecture_name").toString());
-        				
+        		//用于测试的top button
         				
         			}
         		};
         topTextView.setOnClickListener(listener);
-        
+        //--------------------------------------------------
        
         
         
@@ -168,32 +269,29 @@ public class MainView extends Activity
         two = one*2;
         three = one*3;
         four = one*4;
-        //Log.i("info", "获取的屏幕分辨率为" + one + two + three + "X" + displayHeight);
+        
+        Log.i("info", "获取的屏幕分辨率为" + one + two + three + "屏幕分辨率为" + displayWidth + "X" + displayHeight);
         
         //InitImageView();//使用动画
-      //将要分页显示的View装入数组中
+        //将要分页显示的View装入数组中
         LayoutInflater mLi = LayoutInflater.from(this);
         View view1 = mLi.inflate(R.layout.subscribecenter, null);
         View view2 = mLi.inflate(R.layout.hotlecturecenter, null);
         View view3 = mLi.inflate(R.layout.noticecenter, null);
         View view4 = mLi.inflate(R.layout.submitcenter, null);
-        
         View view5 = mLi.inflate(R.layout.mycenter, null);
-        ListView list = (ListView) view2.findViewById(R.id.hot_ListView);//把hot_ListView转成引用
-       //下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
-        list.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
         
+        list = (ListView) view2.findViewById(R.id.hot_ListView);//把hot_ListView转成引用
         
-      //每个页面的view数据
+        //每个页面的view数据
         final ArrayList<View> views = new ArrayList<View>();
         views.add(view1);
         views.add(view2);
         views.add(view3);
         views.add(view4);
-        
         views.add(view5);
         
-      //填充ViewPager的数据适配器
+        //填充ViewPager的数据适配器
         PagerAdapter mPagerAdapter = new PagerAdapter() {
 			
 			@Override
@@ -226,78 +324,11 @@ public class MainView extends Activity
 		};
 		
 		mTabPager.setAdapter(mPagerAdapter);
-		Cursor cursor = dbCenter.select(dbCenter.getReadableDatabase(), null, null, null);
-		startManagingCursor(cursor);
-		Log.i("SELECT", "Cursor游标采取数据开始！");
-
-		List<Map<String, Object>> result = DBCenter
-				.L_converCursorToList(cursor);
-		mData = result;
-		//来自Yao的更改 2014年7月7号
-		myadapter = new Myadapter(this, mData);
-		Log.i("Myadapter", "适配器构建成功！");
-
-		list.setAdapter(myadapter);
-		// ListView 中某项被选中后的逻辑  
-		 list.setOnItemClickListener(new OnItemClickListener() {  
-		        
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-						long arg3) {
-					// TODO Auto-generated method stub
-					Toast.makeText(MainView.this,"您选择了讲座：" 
-					+ myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
-					 
-				}  
-		    });
 		
-		/*final String[] LTitle = { "An introduction to nonparametric regression", 
-				"台湾土壤与地下水污染及整治技术现况",
-				"中国证监会对股市改革政策的创新与发展",
-				"戏剧与哲学",
-				"哈佛诗生活"};  
-	    String[] LTime = { "2014年07月08日（星期二）14点30分", 
-	    		"2014年07月08日（星期二）14点30分", 
-	    			"2014年07月08日（星期二）16点30分",
-	    			"2014年07月08日（星期二）19点00分",
-	    			"2014年07月08日（星期二）19点00分" };  
-	    String[] LAddr = { "【思明校区】经济楼N301",
-	    		"【翔安校区】环境与生态学院A201",
-	    		"【漳州校区】人文大楼B#301",
-	    		"【思明校区】南光一214", 
-	    		"【思明校区】外文学院三楼会议室" }; 
-	    String[] LSpeaker = { "Daniel Henderson 副教授", 
-	    		"林财富教授",
-	    		"王春源", 
-	    		"方旭东 教授", 
-	    		"李美华" };
-		ArrayList<HashMap<String,Object>> listItem = new ArrayList<HashMap<String,Object>>();
-	    for(int i=0;i<5;i++)
-	    {
-	    	HashMap<String,Object> map = new HashMap<String,Object>();
-	    	map.put("lecture_name",LTitle[i]);
-	    	map.put("lecture_time","时间: "+LTime[i]);
-	    	map.put("lecture_addr","地点: "+LAddr[i]);
-	    	map.put("lecture_speaker","主讲: "+LSpeaker[i]);
-	    	listItem.add(map);
-		}
-	    //构造适配器
-	    SimpleAdapter listItemAdapter = new SimpleAdapter(this,listItem,R.layout.item,
-	    		new String[]{"lecture_name","lecture_time","lecture_addr","lecture_speaker"},
-	    		new int[]{R.id.lecture_name,R.id.lecture_time,R.id.lecture_addr,R.id.lecture_speaker
-	    		});
-	   // list.setAdapter(listItemAdapter);
-	    list.setOnItemClickListener(new OnItemClickListener() {  
-	        
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stub
-				 Toast.makeText(MainView.this,"您选择了讲座：" 
-				+ LTitle[arg2],Toast.LENGTH_LONG ).show();  
-			}  
-	    });*/  
-	}
+		//refresh()用于刷新XML文件，下载成功后并把XML转存到数据库，然后用于适配器使用
+		refresh();
+		
+	}    // end function onCreate()
 	
 	/**
 	 * 头标点击监听
@@ -447,6 +478,9 @@ public class MainView extends Activity
 		public void onPageScrollStateChanged(int arg0) {
 		}
 	}
+	
+	
+	//下面的代码先做保留，用于处理android的 三颗 虚拟按键
 	
 //	@Override
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {

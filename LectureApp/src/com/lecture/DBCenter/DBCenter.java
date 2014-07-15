@@ -103,9 +103,9 @@ public class DBCenter extends SQLiteOpenHelper {
 				Map<String, Object> map = new HashMap<String, Object>();
 	           // map.put("luid", cursor.getString(1));
 				map.put("lecture_name", cursor.getString(2));
-				map.put("lecture_time", cursor.getString(3));
-				map.put("lecture_addr", cursor.getString(4));
-				map.put("lecture_speaker", cursor.getString(5));
+				map.put("lecture_time","时间: " + cursor.getString(3));
+				map.put("lecture_addr", "地点: " +  cursor.getString(4));
+				map.put("lecture_speaker", "主讲: " + cursor.getString(5));
 				//map.put("tag", cursor.getString(11));
 				result.add(map);
 			}

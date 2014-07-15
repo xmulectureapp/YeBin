@@ -55,6 +55,7 @@ public class GetEventsHttpUtil {
 				FileOutputStream out = null;
 				InputStream in = null;
 				try {
+					Log.i("DownLoad","开始设置Url并开始下载！");
 					URL url = new URL("http://lecture.xmu.edu.cn/events");
 					connection = (HttpURLConnection) url.openConnection();
 					in = new BufferedInputStream(connection.getInputStream());
