@@ -151,7 +151,11 @@ public class Myadapter extends BaseAdapter
 	
 	public void run_share()
 	{
-		
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+		sendIntent.setType("text/plain");
+		mContext.startActivity(sendIntent);
 	}
 	
 	public Myadapter(Context context)
@@ -245,48 +249,37 @@ public class Myadapter extends BaseAdapter
 			  holder.lectureTime.setText("时间: " + mData.get(position).getTime()); 
 			  holder.lectureAddr.setText("地点: " + mData.get(position).getAddress());  
 			  holder.lectureSpeaker.setText("主讲: " + mData.get(position).getSpeaker()); 
-			  holder.lectureId.setText("id : " + mData.get(position).getUid());
+			  holder.lectureId.setText(mData.get(position).getUid());
 			  final ImageView likeIcon_change = holder.likeIcon;
 			  final TextView likeText_change = holder.likeText;
 			  final ImageView remindIcon_change = holder.remindIcon;
 			  final TextView remindText_change = holder.remindText;
-			  event = mData.get(position);
 			  
 			  
 			 holder.linearlayoutShare.setOnClickListener(new View.OnClickListener() {  
 				    public void onClick(View v) {  
-				     //showInfo1();       
-				    	event = mData.get(position);
-				    	Intent sendIntent = new Intent();
-						sendIntent.setAction(Intent.ACTION_SEND);
-						//sendIntent.setType("text/plain");
-						sendIntent.setType("image/jpg");
-						sendIntent.putExtra(Intent.EXTRA_TITLE, "分享");
-						sendIntent.putExtra(Intent.EXTRA_TEXT,
-								"Hi，跟你分享一个有趣的讲座。" + "\n"
-								+ "主题：" + event.getTitle()+ "\n" 
-								+ "时间：" + event.getTime()+"\n" 
-								+ "地点：" + event.getAddress()+ "\n" 
-								+ "主讲：" + event.getSpeaker() + "\n"
-								+ "（来自厦大讲座网）" + "\n"
-								+ event.getLink());
-						//sendIntent.putExtra(Intent.EXTRA_TEXT, event.getAddress());
-						//sendIntent.putExtra(Intent.EXTRA_TEXT, event.getSpeaker());
-						sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
-				
-						mContext.startActivity(sendIntent);
+				     showInfo1();       
 				    }  
 				   });  
 			 holder.linearlayoutComment.setOnClickListener(new View.OnClickListener() {  
 				    public void onClick(View v) {  
-				     showInfo2();       
+				  //   showInfo2();
+				    	event = mData.get(position);
+						//把该则讲座对应的event传入Bundle，来自KunCheng
+						Bundle detail_bundle = new Bundle();
+						detail_bundle.putSerializable("LectureComment", event);
+						Intent intent = new Intent(mContext, Comment.class);
+						intent.putExtras(detail_bundle);
+						mContext.startActivity(intent);
+				    	
+				    	
 				    }  
 				   });
 			 holder.linearlayoutLike.setOnClickListener(new View.OnClickListener() {  
 				    public void onClick(View v) {  
 				    // showInfo3();      
-				    	
-				    	event = mData.get(position);
+				    	 event = mData.get(position);
+						 
 				    	event.setLike(!event.isLike());
 				    	if (event.isLike())
 				    	{
@@ -303,7 +296,6 @@ public class Myadapter extends BaseAdapter
 			 holder.linearlayoutRemind.setOnClickListener(new View.OnClickListener() {  
 				    public void onClick(View v) {  
 				     //showInfo4();    
-				    	event = mData.get(position);
 				    	event.setReminded(!event.isReminded());
 				    	if (event.isReminded())
 				    	{

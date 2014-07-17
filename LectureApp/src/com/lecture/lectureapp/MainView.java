@@ -57,6 +57,8 @@ import android.widget.Toast;
 public class MainView extends Activity 
 {
 	
+	
+	
 	public static MainView instance = null;
 	
 	//数据库
@@ -64,8 +66,6 @@ public class MainView extends Activity
 	private DBCenter dbCenter = new DBCenter(this, DB_NAME, 1);
 	//private List<Map<String, Object>> mData;
 	private List<Event> mData;
-	private List<Event> mDataNotice;
-	private List<Event> mDataSubscribe;
 	
 	private ViewPager mTabPager;	
 	//private ImageView mTabImg;// 动画图片
@@ -93,11 +93,7 @@ public class MainView extends Activity
 	private TextView mText4;
 	private TextView mText5;
 	private Myadapter myadapter;
-	private MyadapterNotice myadapterNotice;
-	private MyadapterSubscribe myadapterSubscribe;
-	public ListView hotList;
-	public ListView remindList;
-	public ListView subscribeList;
+	public ListView list;
 	private RefreshableView refreshableView;
 	
 	
@@ -140,18 +136,11 @@ public class MainView extends Activity
 						List<Event> result = DBCenter
 								.L_convertCursorToListEvent(cursor);
 						mData = result;
-						mDataNotice = null;
-						mDataSubscribe = result;
 						//来自Yao的更改 2014年7月7号
 						myadapter = new Myadapter(MainView.this, mData);
-						myadapterNotice = new MyadapterNotice(MainView.this, mDataNotice);
-						myadapterSubscribe= new MyadapterSubscribe(MainView.this, mDataSubscribe);
-						
 						Log.i("Myadapter", "适配器构建成功！");
 					    
-						hotList.setAdapter(myadapter);
-						remindList.setAdapter(myadapterNotice);
-						subscribeList.setAdapter(myadapterSubscribe);
+						list.setAdapter(myadapter);
 						
 						//下拉刷新执行部分
 						refreshableView.setOnRefreshListener(new PullToRefreshListener() {
@@ -180,20 +169,28 @@ public class MainView extends Activity
 							}
 						}, 0);
 						//下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
-						hotList.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
-						
+						list.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
 							
 						// ListView 中某项被选中后的逻辑  
-						hotList.setOnItemClickListener(new OnItemClickListener() {  
+						list.setOnItemClickListener(new OnItemClickListener() {  
 						        
 								@Override
 								public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 										long arg3) {
 									// TODO Auto-generated method stub
-									//Toast.makeText(MainView.this,"您选择了讲座：" + myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
 									 
-									Toast.makeText(MainView.this,"您选择了讲座：" 
-											+ ((TextView)arg1.findViewById(R.id.lecture_name)).getText(),Toast.LENGTH_LONG ).show(); 
+									Toast.makeText(MainView.this,"您选择了讲座：" + ((TextView)arg1.findViewById(R.id.lecture_id)).getText(),Toast.LENGTH_LONG ).show();
+									
+									//下面代码来自 KunCheng，用于显示详细信息
+									Bundle detail_bundle = new Bundle();
+									for (Event event : mData) {
+										if(event.getUid() == ((TextView)arg1.findViewById(R.id.lecture_id)).getText() )
+										detail_bundle.putSerializable("LectureDetail", event);
+									}
+									
+									Intent intent = new  Intent(MainView.this, LectureDetail.class);	
+									intent.putExtras(detail_bundle);
+									startActivity(intent);
 								}  
 						    });
 					
@@ -403,15 +400,11 @@ public class MainView extends Activity
         View viewHeader = mLi.inflate(R.layout.head_view, null);
         View viewFooter = mLi.inflate(R.layout.foot_view, null);
         
-        hotList = (ListView)view2.findViewById(R.id.list_view);//把hot_ListView转成引用
-        remindList = (ListView)view3.findViewById(R.id.list_view_notice);
-        subscribeList = (ListView)view1.findViewById(R.id.list_view_subscribe);
+        list = (ListView) view2.findViewById(R.id.list_view);//把hot_ListView转成引用
         
-        hotList.addHeaderView(viewHeader);
-        hotList.addFooterView(viewFooter);
+        list.addHeaderView(viewHeader);
+        list.addFooterView(viewFooter);
         
-        remindList.addHeaderView(viewHeader);
-        subscribeList.addHeaderView(viewHeader);
         refreshableView = (RefreshableView)view2.findViewById(R.id.refreshable_view);
         
         //每个页面的view数据
