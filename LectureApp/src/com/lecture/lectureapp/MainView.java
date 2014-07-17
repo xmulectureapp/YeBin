@@ -15,6 +15,9 @@ import com.lecture.lectureapp.R;
 
 
 
+import com.lecture.localdata.Event;
+import com.lecture.pulltorefresh.RefreshableView;
+import com.lecture.pulltorefresh.RefreshableView.PullToRefreshListener;
 import com.lecture.util.GetEventsHttpUtil;
 import com.lecture.util.GetEventsHttpUtil.GetEventsCallback;
 
@@ -35,6 +38,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -60,10 +64,11 @@ public class MainView extends Activity
 	//数据库
 	public static final String DB_NAME = "LectureDB";
 	private DBCenter dbCenter = new DBCenter(this, DB_NAME, 1);
-	private List<Map<String, Object>> mData;
+	//private List<Map<String, Object>> mData;
+	private List<Event> mData;
 	
 	private ViewPager mTabPager;	
-	private ImageView mTabImg;// 动画图片
+	//private ImageView mTabImg;// 动画图片
 	private ImageView mTab1,mTab2,mTab3,mTab4;
 	private int zero = 0;// 动画图片偏移量
 	private int currIndex = 0;// 当前页卡编号
@@ -89,16 +94,22 @@ public class MainView extends Activity
 	private TextView mText5;
 	private Myadapter myadapter;
 	public ListView list;
+	private RefreshableView refreshableView;
 	
-	//mainview top button
-	private TextView topTextView;
+	
 	
 	
 	
 	//——————————————————————下面是用于handler的消息标记
-		private static final int MESSAGE_REFRESH_START = 1;//刷新开始
-		private static final int MESSAGE_REFRESH_END = 2;//刷新结束
-		private static final int MESSAGE_REFRESH_FAILED = 3;//刷新失败
+	private static final int MESSAGE_REFRESH_START = 1;//刷新开始
+	private static final int MESSAGE_REFRESH_END = 2;//刷新结束
+	private static final int MESSAGE_REFRESH_FAILED = 3;//刷新失败
+	private static final int MESSAGE_PULL_REFRESH_START = 4;//pull刷新开始
+	private static final int MESSAGE_PULL_REFRESH_END = 5;//pull刷新结束
+	private static final int MESSAGE_PULL_REFRESH_FAILED = 6;//pull刷新失败
+	private static final int MESSAGE_PULL_REFRESH_LISTVIEW = 7;//pull成功，listView开始更新
+	
+	
 		private ProgressDialog mProgressDialog;
 		
 		//第二个handler
@@ -106,6 +117,7 @@ public class MainView extends Activity
 			@Override
 			public void handleMessage(Message message) {
 				final String msg = (String) message.obj;
+				Message msgRepost = Message.obtain();
 				if (message.what == MESSAGE_REFRESH_START) {
 					mProgressDialog = ProgressDialog.show(MainView.this,
 							"请稍后", msg, true, false);
@@ -121,14 +133,41 @@ public class MainView extends Activity
 						//startManagingCursor(cursor);
 						Log.i("SELECT", "Cursor游标采取数据开始！");
 
-						List<Map<String, Object>> result = DBCenter
-								.L_converCursorToList(cursor);
+						List<Event> result = DBCenter
+								.L_convertCursorToListEvent(cursor);
 						mData = result;
 						//来自Yao的更改 2014年7月7号
 						myadapter = new Myadapter(MainView.this, mData);
 						Log.i("Myadapter", "适配器构建成功！");
 					    
 						list.setAdapter(myadapter);
+						
+						//下拉刷新执行部分
+						refreshableView.setOnRefreshListener(new PullToRefreshListener() {
+							@Override
+							public void onRefresh() {
+								
+								try {
+									
+									//getActionBar()
+									//list.setClickable(false);
+									//list.setFocusable(false);
+									//list.setPressed(false);
+									//list.setFocusableInTouchMode(false);
+									
+									pullRefresh();
+									
+									
+									Thread.sleep(3000);
+									//Thread.sleep(3000);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								
+								//Toast.makeText(MainView.this, "正在刷新……", Toast.LENGTH_LONG).show();
+								//refreshableView.finishRefreshing(myadapter);
+							}
+						}, 0);
 						//下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
 						list.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
 							
@@ -139,8 +178,19 @@ public class MainView extends Activity
 								public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 										long arg3) {
 									// TODO Auto-generated method stub
-									//Toast.makeText(MainView.this,"您选择了讲座：" + myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
 									 
+									Toast.makeText(MainView.this,"您选择了讲座：" + ((TextView)arg1.findViewById(R.id.lecture_id)).getText(),Toast.LENGTH_LONG ).show();
+									
+									//下面代码来自 KunCheng，用于显示详细信息
+									Bundle detail_bundle = new Bundle();
+									for (Event event : mData) {
+										if(event.getUid() == ((TextView)arg1.findViewById(R.id.lecture_id)).getText() )
+										detail_bundle.putSerializable("LectureDetail", event);
+									}
+									
+									Intent intent = new  Intent(MainView.this, LectureDetail.class);	
+									intent.putExtras(detail_bundle);
+									startActivity(intent);
 								}  
 						    });
 					
@@ -151,6 +201,36 @@ public class MainView extends Activity
 					mProgressDialog = null;
 					Toast.makeText(MainView.this, msg, Toast.LENGTH_SHORT)
 							.show();
+				}
+				else if(message.what == MESSAGE_PULL_REFRESH_START){
+					
+				}
+				else if(message.what == MESSAGE_PULL_REFRESH_END){
+					msgRepost = Message.obtain();
+					msgRepost.what = MESSAGE_PULL_REFRESH_LISTVIEW;
+					msgRepost.obj = "下拉刷新成功，下一步开始更新 ListView";
+					refreshHandler.sendMessage(msgRepost);
+					
+				}
+				else if(message.what == MESSAGE_PULL_REFRESH_FAILED){
+					
+				}
+				else if(message.what == MESSAGE_PULL_REFRESH_LISTVIEW){
+					Log.i("MESSAGE_XML_TO_LISTDB_SUCCESS", "光标Cursor准备就绪！");
+					
+					Cursor cursor = dbCenter.select(dbCenter.getReadableDatabase(), "NOT NULL", null, null);
+					//startManagingCursor(cursor);
+					Log.i("SELECT", "Cursor游标采取数据开始！");
+
+					List<Event> result = DBCenter
+							.L_convertCursorToListEvent(cursor);
+					mData = result;
+					myadapter.setMData(mData);
+					myadapter.notifyDataSetChanged();
+					
+					refreshableView.finishRefreshing(myadapter);
+					//myadapter.notifyDataSetInvalidated();
+					Log.i("ListView刷新", "刷新ListView成功！");
 				}
 
 			}
@@ -175,8 +255,10 @@ public class MainView extends Activity
 						public void onEnd() {
 							
 							//XML TO List, then to db
+							
 							XMLToList xmlToList = new XMLToList();
-							xmlToList.insertListToDB(MainView.this, dbCenter, "LectureTable");
+							//DBCenter.clearAllData(dbCenter.getReadableDatabase(), DBCenter.LECTURE_TABLE);
+							xmlToList.insertListToDB(MainView.this, dbCenter, DBCenter.LECTURE_TABLE);
 							
 							Log.i("在RefreshCenter进行的操作", "XMLToList已经将数据存入数据库！");
 							Message msg = new Message();
@@ -200,6 +282,55 @@ public class MainView extends Activity
 			
 		}
 		//--------------refresh() 结束
+		
+		
+		//-------------------pull refresh--------------------------
+		
+		public void pullRefresh() {
+			GetEventsHttpUtil getEventsUtil = GetEventsHttpUtil
+					.getInstance(new GetEventsCallback() {
+
+						@Override
+						public void onStart() {
+							Message msg = new Message();
+							msg.what = MESSAGE_PULL_REFRESH_START;
+							msg.obj = "正在更新...";
+							refreshHandler.sendMessage(msg);
+						}
+
+						@Override
+						public void onEnd() {
+							
+							//XML TO List, then to db
+							
+							XMLToList xmlToList = new XMLToList();
+							
+							//删除数据库
+							DBCenter.clearAllData(dbCenter.getReadableDatabase(), DBCenter.LECTURE_TABLE);
+							xmlToList.insertListToDB(MainView.this, dbCenter, DBCenter.LECTURE_TABLE);
+							
+							Log.i("在RefreshCenter进行的操作", "XMLToList已经将数据存入数据库！");
+							Message msg = new Message();
+							msg.what = MESSAGE_PULL_REFRESH_END;
+							refreshHandler.sendMessage(msg);
+							
+							
+							
+						}
+
+						@Override
+						public void onNoInternet() {
+							Message msg = new Message();
+							msg.what = MESSAGE_PULL_REFRESH_FAILED;
+							msg.obj = "无法连接到网络...";
+							refreshHandler.sendMessage(msg);
+						}
+					});
+			getEventsUtil.getInfo(this);
+			
+		}
+		
+		//-------------------pull refresh end--------------------------
 
 
 	
@@ -208,6 +339,7 @@ public class MainView extends Activity
 	{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);	
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.mainview);
 		
 		 //启动activity时不自动弹出软键盘
@@ -225,7 +357,7 @@ public class MainView extends Activity
         
         mTab5 = (ImageView) findViewById(R.id.img_mycenter);
         
-        mTabImg = (ImageView) findViewById(R.id.img_tab_now);
+       // mTabImg = (ImageView) findViewById(R.id.img_tab_now);
         mTab1.setOnClickListener(new MyOnClickListener(0));
         mTab2.setOnClickListener(new MyOnClickListener(1));
         
@@ -242,22 +374,6 @@ public class MainView extends Activity
         mText5 = (TextView)findViewById(R.id.mText5);
     
         
-        //下面获取mianview上面的筛选讲座按钮的句柄
-        topTextView = (TextView)findViewById(R.id.filterTextView);
-        OnClickListener listener = 
-                
-                new OnClickListener() {
-        			
-        			@Override
-        			public void onClick(View arg0) {
-        				
-        				
-        		//用于测试的top button
-        				
-        			}
-        		};
-        topTextView.setOnClickListener(listener);
-        //--------------------------------------------------
        
         
         
@@ -281,7 +397,15 @@ public class MainView extends Activity
         View view4 = mLi.inflate(R.layout.submitcenter, null);
         View view5 = mLi.inflate(R.layout.mycenter, null);
         
-        list = (ListView) view2.findViewById(R.id.hot_ListView);//把hot_ListView转成引用
+        View viewHeader = mLi.inflate(R.layout.head_view, null);
+        View viewFooter = mLi.inflate(R.layout.foot_view, null);
+        
+        list = (ListView) view2.findViewById(R.id.list_view);//把hot_ListView转成引用
+        
+        list.addHeaderView(viewHeader);
+        list.addFooterView(viewFooter);
+        
+        refreshableView = (RefreshableView)view2.findViewById(R.id.refreshable_view);
         
         //每个页面的view数据
         final ArrayList<View> views = new ArrayList<View>();
@@ -467,7 +591,7 @@ public class MainView extends Activity
 			currIndex = arg0;
 			animation.setFillAfter(true);// True:图片停在动画结束位置
 			animation.setDuration(150);
-			mTabImg.startAnimation(animation);
+			//mTabImg.startAnimation(animation);
 		}
 		
 		@Override
