@@ -50,12 +50,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainView extends Activity 
 {
+	
+	
 	
 	public static MainView instance = null;
 	
@@ -66,6 +69,7 @@ public class MainView extends Activity
 	private List<Event> mData;
 	private List<Event> mDataNotice;
 	private List<Event> mDataSubscribe;
+
 	
 	private ViewPager mTabPager;	
 	//private ImageView mTabImg;// 动画图片
@@ -98,6 +102,7 @@ public class MainView extends Activity
 	public ListView hotList;
 	public ListView remindList;
 	public ListView subscribeList;
+
 	private RefreshableView refreshableView;
 	
 	
@@ -144,14 +149,15 @@ public class MainView extends Activity
 						mDataSubscribe = result;
 						//来自Yao的更改 2014年7月7号
 						myadapter = new Myadapter(MainView.this, mData);
+						myadapter.setDBCenter(dbCenter);
 						myadapterNotice = new MyadapterNotice(MainView.this, mDataNotice);
 						myadapterSubscribe= new MyadapterSubscribe(MainView.this, mDataSubscribe);
-						
 						Log.i("Myadapter", "适配器构建成功！");
 					    
 						hotList.setAdapter(myadapter);
 						remindList.setAdapter(myadapterNotice);
 						subscribeList.setAdapter(myadapterSubscribe);
+						
 						
 						//下拉刷新执行部分
 						refreshableView.setOnRefreshListener(new PullToRefreshListener() {
@@ -159,13 +165,13 @@ public class MainView extends Activity
 							public void onRefresh() {
 								
 								try {
-									
-									//getActionBar()
-									//list.setClickable(false);
-									//list.setFocusable(false);
-									//list.setPressed(false);
-									//list.setFocusableInTouchMode(false);
-									
+									/*
+									View view = hotList.getFocusedChild();
+									if(view == null)
+										Log.i("onRefresh", "view is null");
+									( (RelativeLayout)view.findViewById(R.id.itemAll) )
+									.setBackground(getResources().getDrawable(R.color.item_background));
+									*/
 									pullRefresh();
 									
 									
@@ -181,7 +187,6 @@ public class MainView extends Activity
 						}, 0);
 						//下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
 						hotList.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
-						
 							
 						// ListView 中某项被选中后的逻辑  
 						hotList.setOnItemClickListener(new OnItemClickListener() {  
@@ -190,10 +195,19 @@ public class MainView extends Activity
 								public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 										long arg3) {
 									// TODO Auto-generated method stub
-									//Toast.makeText(MainView.this,"您选择了讲座：" + myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
 									 
-									Toast.makeText(MainView.this,"您选择了讲座：" 
-											+ ((TextView)arg1.findViewById(R.id.lecture_name)).getText(),Toast.LENGTH_LONG ).show(); 
+									Toast.makeText(MainView.this,"您选择了讲座：" + ((TextView)arg1.findViewById(R.id.lecture_id)).getText(),Toast.LENGTH_LONG ).show();
+									
+									//下面代码来自 KunCheng，用于显示详细信息
+									Bundle detail_bundle = new Bundle();
+									for (Event event : mData) {
+										if(event.getUid() == ((TextView)arg1.findViewById(R.id.lecture_id)).getText() )
+										detail_bundle.putSerializable("LectureDetail", event);
+									}
+									
+									Intent intent = new  Intent(MainView.this, LectureDetail.class);	
+									intent.putExtras(detail_bundle);
+									startActivity(intent);
 								}  
 						    });
 					
@@ -263,7 +277,14 @@ public class MainView extends Activity
 							//DBCenter.clearAllData(dbCenter.getReadableDatabase(), DBCenter.LECTURE_TABLE);
 							xmlToList.insertListToDB(MainView.this, dbCenter, DBCenter.LECTURE_TABLE);
 							
-							Log.i("在RefreshCenter进行的操作", "XMLToList已经将数据存入数据库！");
+							Log.i("onEnd", "XMLToList已经将数据存入数据库！");
+							
+							Log.i("onEnd", "开始refresh like 和 收藏");
+							
+							DBCenter.refreshLike(dbCenter.getReadableDatabase());
+							DBCenter.refreshCollection(dbCenter.getReadableDatabase());
+							
+							
 							Message msg = new Message();
 							msg.what = MESSAGE_REFRESH_END;
 							refreshHandler.sendMessage(msg);
@@ -403,15 +424,18 @@ public class MainView extends Activity
         View viewHeader = mLi.inflate(R.layout.head_view, null);
         View viewFooter = mLi.inflate(R.layout.foot_view, null);
         
-        hotList = (ListView)view2.findViewById(R.id.list_view);//把hot_ListView转成引用
+        hotList = (ListView) view2.findViewById(R.id.list_view);//把hot_ListView转成引用
         remindList = (ListView)view3.findViewById(R.id.list_view_notice);
         subscribeList = (ListView)view1.findViewById(R.id.list_view_subscribe);
-        
+
         hotList.addHeaderView(viewHeader);
         hotList.addFooterView(viewFooter);
-        
         remindList.addHeaderView(viewHeader);
+        remindList.addHeaderView(viewFooter);
         subscribeList.addHeaderView(viewHeader);
+        subscribeList.addHeaderView(viewFooter);
+
+        
         refreshableView = (RefreshableView)view2.findViewById(R.id.refreshable_view);
         
         //每个页面的view数据
