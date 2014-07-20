@@ -14,8 +14,7 @@ public class Event implements Serializable {
 	private String link;
 	private String speaker;
 	private boolean isCalender;
-	private boolean isLike;
-	private boolean isReminded;
+	private boolean isLove;
 	private DetailInfo detailInfo;
 	private ReminderInfo reminderInfo;
 
@@ -26,8 +25,7 @@ public class Event implements Serializable {
 		time = "";
 		link = "";
 		isCalender = false;
-		isLike = false;
-		isReminded = false;
+		isLove = false;
 		detailInfo = new DetailInfo();
 		reminderInfo = new ReminderInfo(0, 0);
 	}
@@ -50,19 +48,7 @@ public class Event implements Serializable {
 	}
 
 	public void setUid(String uid) {
-		uid=uid.trim();  
-		String uid1="";  
-		if(uid != null && !"".equals(uid))
-		{  
-			for(int i=0;i<uid.length();i++)
-			{  
-				if(uid.charAt(i)>=48 && uid.charAt(i)<=57)
-				{  
-					uid1+=uid.charAt(i);  
-				}
-			}
-		}
-		this.uid = uid1;
+		this.uid = uid;
 	}
 
 	public String getTitle() {
@@ -122,20 +108,12 @@ public class Event implements Serializable {
 		this.isCalender = isCalender;
 	}
 
-	public boolean isLike() {
-		return isLike;
+	public boolean isLove() {
+		return isLove;
 	}
 
-	public void setLike(boolean isLike) {
-		this.isLike = isLike;
-	}
-	
-	public boolean isReminded(){
-		return isReminded;
-	}
-	
-	public void setReminded(boolean isReminded){
-		this.isReminded = isReminded;
+	public void setLove(boolean isLove) {
+		this.isLove = isLove;
 	}
 
 	public ReminderInfo getReminderInfo() {
@@ -147,7 +125,7 @@ public class Event implements Serializable {
 	}
 
 	public Event merger(Event data2) {
-		this.isLike = data2.isLike;
+		this.isLove = data2.isLove;
 		this.isCalender = data2.isCalender;
 		this.detailInfo = data2.detailInfo;
 		this.reminderInfo = data2.reminderInfo;

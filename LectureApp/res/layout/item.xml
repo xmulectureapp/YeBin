@@ -5,21 +5,18 @@
 	android:layout_gravity="right|center"
 	android:background="@drawable/item_selector"
 	android:orientation="vertical"
-	android:textAlignment="center"
-	android:id="@+id/itemAll"
-	 >
+	android:textAlignment="center" >
 
     <RelativeLayout
-    	android:id="@+id/relativeLayout1"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_alignParentLeft="true"
-    	android:layout_marginBottom="1dp"
-    	android:layout_marginLeft="10dp"
-    	android:layout_marginRight="10dp"
-    	android:layout_marginTop="5dp"
-    	android:longClickable="false"
-    	android:orientation="vertical" >
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/lecture_name"
@@ -41,18 +38,6 @@
             android:background="@color/item_line" />
 
         <TextView
-            android:id="@+id/lecture_time"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/line_1"
-            android:layout_margin="5dp"
-            android:layout_marginTop="30dp"
-            android:text="时间："
-            android:textColor="@color/item_content"
-            android:textSize="15dip" />
-        
-        <TextView
             android:id="@+id/lecture_addr"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -64,17 +49,21 @@
             android:textColor="@color/item_content"
             android:textSize="15dip" />
 
-        
-        <LinearLayout 
-            android:id ="@+id/linearlayout_id"
-            android:orientation="horizontal" 
+        <TextView
+            android:id="@+id/lecture_time"
             android:layout_width="fill_parent"
-    		android:layout_height="wrap_content"
-    		android:layout_below="@+id/lecture_addr">
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/line_1"
+            android:layout_margin="5dp"
+            android:layout_marginTop="30dp"
+            android:text="时间："
+            android:textColor="@color/item_content"
+            android:textSize="15dip" />
 
         <TextView
             android:id="@+id/lecture_speaker"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/lecture_addr"
@@ -84,22 +73,11 @@
             android:textColor="@color/item_content"
             android:textSize="15dip" />
 
-        <TextView
-            android:id="@+id/lecture_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_marginTop="30dp"
-            android:text="id : "
-            android:textColor="@color/item_transparent"
-            android:textSize="15dip" />
-
-        </LinearLayout>
         <ImageView
             android:id="@+id/line_2"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/linearlayout_id"
+            android:layout_below="@+id/lecture_speaker"
             android:background="@color/item_line" />
     </RelativeLayout>
 

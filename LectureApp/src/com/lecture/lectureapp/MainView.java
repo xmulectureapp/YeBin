@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.LocalActivityManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -50,7 +51,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,9 +67,6 @@ public class MainView extends Activity
 	private DBCenter dbCenter = new DBCenter(this, DB_NAME, 1);
 	//private List<Map<String, Object>> mData;
 	private List<Event> mData;
-	private List<Event> mDataNotice;
-	private List<Event> mDataSubscribe;
-
 	
 	private ViewPager mTabPager;	
 	//private ImageView mTabImg;// 动画图片
@@ -97,16 +94,11 @@ public class MainView extends Activity
 	private TextView mText4;
 	private TextView mText5;
 	private Myadapter myadapter;
-	private MyadapterNotice myadapterNotice;
-	private MyadapterSubscribe myadapterSubscribe;
-	public ListView hotList;
-	public ListView remindList;
-	public ListView subscribeList;
-
+	public ListView list;
 	private RefreshableView refreshableView;
 	
 	
-	
+	LocalActivityManager manager = null;
 	
 	
 	//——————————————————————下面是用于handler的消息标记
@@ -145,19 +137,11 @@ public class MainView extends Activity
 						List<Event> result = DBCenter
 								.L_convertCursorToListEvent(cursor);
 						mData = result;
-						mDataNotice = null;
-						mDataSubscribe = result;
 						//来自Yao的更改 2014年7月7号
 						myadapter = new Myadapter(MainView.this, mData);
-						myadapter.setDBCenter(dbCenter);
-						myadapterNotice = new MyadapterNotice(MainView.this, mDataNotice);
-						myadapterSubscribe= new MyadapterSubscribe(MainView.this, mDataSubscribe);
 						Log.i("Myadapter", "适配器构建成功！");
 					    
-						hotList.setAdapter(myadapter);
-						remindList.setAdapter(myadapterNotice);
-						subscribeList.setAdapter(myadapterSubscribe);
-						
+						list.setAdapter(myadapter);
 						
 						//下拉刷新执行部分
 						refreshableView.setOnRefreshListener(new PullToRefreshListener() {
@@ -165,13 +149,13 @@ public class MainView extends Activity
 							public void onRefresh() {
 								
 								try {
-									/*
-									View view = hotList.getFocusedChild();
-									if(view == null)
-										Log.i("onRefresh", "view is null");
-									( (RelativeLayout)view.findViewById(R.id.itemAll) )
-									.setBackground(getResources().getDrawable(R.color.item_background));
-									*/
+									
+									//getActionBar()
+									//list.setClickable(false);
+									//list.setFocusable(false);
+									//list.setPressed(false);
+									//list.setFocusableInTouchMode(false);
+									
 									pullRefresh();
 									
 									
@@ -186,28 +170,19 @@ public class MainView extends Activity
 							}
 						}, 0);
 						//下面上对item的默认点击显示颜色进行改变, 把默认点击效果取消
-						hotList.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
+						list.setSelector(getResources().getDrawable(R.drawable.item_none_selector));
 							
 						// ListView 中某项被选中后的逻辑  
-						hotList.setOnItemClickListener(new OnItemClickListener() {  
+						list.setOnItemClickListener(new OnItemClickListener() {  
 						        
 								@Override
 								public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 										long arg3) {
 									// TODO Auto-generated method stub
+									//Toast.makeText(MainView.this,"您选择了讲座：" + myadapter.LTitle[arg2],Toast.LENGTH_LONG ).show(); 
 									 
-									Toast.makeText(MainView.this,"您选择了讲座：" + ((TextView)arg1.findViewById(R.id.lecture_id)).getText(),Toast.LENGTH_LONG ).show();
-									
-									//下面代码来自 KunCheng，用于显示详细信息
-									Bundle detail_bundle = new Bundle();
-									for (Event event : mData) {
-										if(event.getUid() == ((TextView)arg1.findViewById(R.id.lecture_id)).getText() )
-										detail_bundle.putSerializable("LectureDetail", event);
-									}
-									
-									Intent intent = new  Intent(MainView.this, LectureDetail.class);	
-									intent.putExtras(detail_bundle);
-									startActivity(intent);
+									Toast.makeText(MainView.this,"您选择了讲座：" 
+											+ ((TextView)arg1.findViewById(R.id.lecture_name)).getText(),Toast.LENGTH_LONG ).show(); 
 								}  
 						    });
 					
@@ -277,14 +252,7 @@ public class MainView extends Activity
 							//DBCenter.clearAllData(dbCenter.getReadableDatabase(), DBCenter.LECTURE_TABLE);
 							xmlToList.insertListToDB(MainView.this, dbCenter, DBCenter.LECTURE_TABLE);
 							
-							Log.i("onEnd", "XMLToList已经将数据存入数据库！");
-							
-							Log.i("onEnd", "开始refresh like 和 收藏");
-							
-							DBCenter.refreshLike(dbCenter.getReadableDatabase());
-							DBCenter.refreshCollection(dbCenter.getReadableDatabase());
-							
-							
+							Log.i("在RefreshCenter进行的操作", "XMLToList已经将数据存入数据库！");
 							Message msg = new Message();
 							msg.what = MESSAGE_REFRESH_END;
 							refreshHandler.sendMessage(msg);
@@ -424,17 +392,10 @@ public class MainView extends Activity
         View viewHeader = mLi.inflate(R.layout.head_view, null);
         View viewFooter = mLi.inflate(R.layout.foot_view, null);
         
-        hotList = (ListView) view2.findViewById(R.id.list_view);//把hot_ListView转成引用
-        remindList = (ListView)view3.findViewById(R.id.list_view_notice);
-        subscribeList = (ListView)view1.findViewById(R.id.list_view_subscribe);
-
-        hotList.addHeaderView(viewHeader);
-        hotList.addFooterView(viewFooter);
-        remindList.addHeaderView(viewHeader);
-        remindList.addHeaderView(viewFooter);
-        subscribeList.addHeaderView(viewHeader);
-        subscribeList.addHeaderView(viewFooter);
-
+        list = (ListView) view2.findViewById(R.id.list_view);//把hot_ListView转成引用
+        
+        list.addHeaderView(viewHeader);
+        list.addFooterView(viewFooter);
         
         refreshableView = (RefreshableView)view2.findViewById(R.id.refreshable_view);
         
@@ -443,7 +404,14 @@ public class MainView extends Activity
         views.add(view1);
         views.add(view2);
         views.add(view3);
-        views.add(view4);
+        //views.add(view4);
+        
+        manager = new LocalActivityManager(this , true);
+        manager.dispatchCreate(savedInstanceState);
+        
+        Intent intent = new Intent(MainView.this, SubmitCenter.class);
+        views.add(getView("SubmitCenter", intent));
+        
         views.add(view5);
         
         //填充ViewPager的数据适配器
@@ -484,6 +452,10 @@ public class MainView extends Activity
 		refresh();
 		
 	}    // end function onCreate()
+	
+	private View getView(String id, Intent intent) {
+        return manager.startActivity(id, intent).getDecorView();
+    }
 	
 	/**
 	 * 头标点击监听
@@ -595,6 +567,7 @@ public class MainView extends Activity
 					mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_normal));
 					mText5.setTextColor(getResources().getColor(R.color.main_menu_normal));
 				}
+				
 				break;
 			case 4:
 				mTab5.setImageDrawable(getResources().getDrawable(R.drawable.mycenter_pressed));
