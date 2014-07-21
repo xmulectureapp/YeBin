@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.LocalActivityManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -59,7 +60,7 @@ import android.widget.Toast;
 public class MainView extends Activity 
 {
 	
-	
+	LocalActivityManager manager = null;
 	
 	public static MainView instance = null;
 	
@@ -548,7 +549,14 @@ public class MainView extends Activity
         views.add(view1);
         views.add(view2);
         views.add(view3);
-        views.add(view4);
+        //views.add(view4);
+        
+        manager = new LocalActivityManager(this , true);
+        manager.dispatchCreate(savedInstanceState);
+        
+        Intent intent = new Intent(MainView.this, SubmitCenter.class);
+        views.add(getView("SubmitCenter", intent));
+        
         views.add(view5);
         
         //填充ViewPager的数据适配器
@@ -589,6 +597,10 @@ public class MainView extends Activity
 		refresh();
 		
 	}    // end function onCreate()
+	
+	private View getView(String id, Intent intent) {
+        return manager.startActivity(id, intent).getDecorView();
+    }
 	
 	/**
 	 * 头标点击监听
