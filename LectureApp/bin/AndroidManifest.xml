@@ -40,7 +40,11 @@
         <activity
             android:name="com.lecture.lectureapp.LectureDetail"/>
         <activity
+            android:name="com.lecture.lectureapp.Comment"/>
+        
+        <activity
             android:name="com.lecture.lectureapp.SubmitCenter"/>
+        
     </application>
 
 </manifest>

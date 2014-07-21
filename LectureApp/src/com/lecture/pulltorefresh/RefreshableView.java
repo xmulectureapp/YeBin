@@ -1,7 +1,7 @@
 package com.lecture.pulltorefresh;
 
 
-import com.lecture.lectureapp.Myadapter;
+import com.lecture.lectureapp.HotMyadapter;
 import com.lecture.lectureapp.R;
 
 import android.content.Context;
@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -220,6 +221,11 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		setIsAbleToPull(event);
+		
+		//这是尝试开始修复下拉时还有焦点的BUG
+		//View view = null;
+		
+		
 		if (ableToPull) {
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
@@ -266,6 +272,18 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
 				listView.setFocusable(false);
 				//listView.setItemsCanFocus(false);
 				
+				//这是尝试开始修复下拉时还有焦点的BUG
+				//View view = null;
+				/*
+				if((view = listView.getChildAt(1)) != null){
+					Log.i("下拉焦点BUG", "NOT NULL");
+					( (RelativeLayout)view.findViewById(R.id.itemAll) )
+					.setBackground(getResources().getDrawable(R.color.item_background));
+				}
+				else{
+					Log.i("下拉焦点BUG", "NULL");
+				}
+				*/
 				listView.setFocusableInTouchMode(false);
 				lastStatus = currentStatus;
 				// 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
@@ -296,7 +314,7 @@ public class RefreshableView extends LinearLayout implements OnTouchListener {
 		preferences.edit().putLong(UPDATED_AT + mId, System.currentTimeMillis()).commit();
 		new HideHeaderTask().execute();
 	}
-	public void finishRefreshing(Myadapter myadapter) {
+	public void finishRefreshing(HotMyadapter myadapter) {
 		currentStatus = STATUS_REFRESH_FINISHED;
 		preferences.edit().putLong(UPDATED_AT + mId, System.currentTimeMillis()).commit();
 		new HideHeaderTask().execute();
